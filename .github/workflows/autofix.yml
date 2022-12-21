@@ -1,0 +1,23 @@
+name: Automatically fix all software bugs
+
+on:
+  schedule:
+    - cron:  '0 0 * * 0'
+
+jobs:
+  scheduled:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out this repo
+      uses: actions/checkout@v2
+    - name: Run autofix
+      env:
+        GITHUB_TOKEN: ${{ secrets.CODERAUTOFIX_GITHUB_TOKEN }}
+      run: |-
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        brew install gh
+
+        git clone https://github.com/coder/coder
+        cd coder
+
+        ../bin/autofix --branches --pull-request

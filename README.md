@@ -1,8 +1,5 @@
 # Autofix
 
-[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-ready--to--code-908a85?logo=gitpod)](https://gitpod.io/#https://github.com/autofix-dev/autofix)
-[![NPM version](https://img.shields.io/npm/v/autofix)](https://www.npmjs.com/package/autofix)
-
 Automatically fix all software bugs.
 
 
@@ -20,44 +17,15 @@ Preview all the commands this would run, but don't actually do anything:
 autofix --dry
 ```
 
-Autofix bugs, commit fixes into separate branches, push branches to a GitHub remote:
+Autofix bugs in a GitHub repository, commit fixes into separate branches, and automatically send pull requests (requires [gh](https://github.com/cli/cli)):
 
 ```bash
-autofix --branches --push=myremote
+autofix --branches --pull-request
 ```
 
-Autofix bugs in a GitHub repository:
+## Dependencies
 
-```bash
-autofix https://github.com/nodejs/node
-```
-
-Autofix bugs in a GitHub repository, commit fixes, and automatically send pull requests (requires [hub](https://github.com/github/hub)):
-
-```bash
-autofix https://github.com/nodejs/node --pull-request
-```
-
-
-## Try it online
-
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/autofix-dev/autofix)
-
-
-## Try it locally
-
-If you have [npm](https://www.npmjs.com), you can already run `autofix` via `npx`:
-
-```bash
-npx autofix
-```
-
-Alternatively, can also install it like so:
-
-```bash
-npm install -g autofix
-```
-
+- [gh](https://github.com/cli/cli)
 
 ## Command line options
 
@@ -78,26 +46,18 @@ OPTIONS:
 - [x] `--pull-request`: Automatically open pull requests with pushed commits (requires [hub](https://github.com/github/hub), implies `--push=origin` if unspecified)
 - [x] `--branch-suffix=SUFFIX`: Add a common suffix to generated branch names (i.e. `autofix-codespell-SUFFIX`)
 - [x] `--signoff`: Use Git's `--signoff` (or `-s`) feature when creating commits
-- [ ] `--circle-ci`: Run this autofix weekly on CircleCI (adds a `.circleci/config.yml` file)
-
 
 ## Types of bugs that can be fixed
 
 Tier 0 (no rework needed):
 - [x] Remove trailing whitespace (uses `git`, `xargs` and `sed`)
-- [x] Update pinned pyenv tool versions in Dockerfiles (requires `pyenv`)
-- [x] Update pinned nvm tool versions in Dockerfiles (requires `nvm`)
-- [x] Update pinned sdkman tool versions in Dockerfiles (requires [sdkman](https://github.com/sdkman/sdkman-cli))
-- [x] Update pinned rr versions in Dockerfiles
-- [x] Update some pinned Go module versions in Dockerfiles
+- [x] Applies `make fmt` on the coder/coder codebase.
+- [x] Update version of terraform in the coder/coder codebase.
 - [x] Update Git submodules
 
 Tier 1 (some rework might be needed):
-- [x] Fix typos & spelling mistakes (requires [codespell](https://github.com/codespell-project/codespell/))
 
 Tier 2 (experimental, use with caution):
-- [x] Fix C++ bugs with `clang-tidy` (requires [clang-tidy](http://clang.llvm.org/extra/clang-tidy/))
-- [ ] Fix Rust bugs with `clippy` (requires [rust-clippy](https://github.com/rust-lang-nursery/rust-clippy/))
 
 Tier 3 (you probably don't want to run these):
 - [ ] TODO

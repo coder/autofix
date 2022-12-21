@@ -78,6 +78,7 @@ Promise.all([...coreFixers, ...customFixers].map(async (fixer) => {
       const fixBranch = argv.branches ? `autofix-${fixer.id}${argv['branch-suffix'] ? '-' + argv['branch-suffix'] : ''}` : baseBranch;
       if (argv.branches) {
         // If --branches was passed, create a dedicated branch for this fixer.
+        await exec(`git branch -D ${fixBranch} 2>&1 || true`);
         await exec(`git checkout -b ${fixBranch} ${baseBranch} 2>&1`);
       }
 
@@ -100,7 +101,8 @@ Promise.all([...coreFixers, ...customFixers].map(async (fixer) => {
       // Attempt to commit any changes (will fail if there is no change).
       let committed = false;
       try {
-        await exec(`git commit -a${argv.signoff ? 's' : ''}m "Autofix: ${fixer.id}" 2>/dev/null`);
+        await exec(`git commit -a${argv.signoff ? 's' : ''}m "chore(autofix): ${fixer.id} \n
+Automatically generated via https://github.com/coder/autofix" 2>/dev/null`);
         committed = true;
         if (!argv.dry) {
           console.log(`  Fixes committed!`);
@@ -114,11 +116,12 @@ Promise.all([...coreFixers, ...customFixers].map(async (fixer) => {
 
       if (committed && pushRemote) {
         // If fixes were committed, and --push=myremote or --pull-request were passed, push to the appropriate remote.
+        await exec(`git push ${pushRemote} :${fixBranch} 2>&1 || true`);
         await exec(`git push ${pushRemote} ${fixBranch} 2>&1`);
 
         if (argv['pull-request']) {
           // If --pull-request was passed, open a Pull Request from the pushed branch to the upstream repository's default branch.
-          await exec(`hub pull-request --head "${pushRemote}:${fixBranch}" --no-edit`);
+          await exec(`gh pr create --repo coder/coder --head ${fixBranch} --fill`);
         }
       }
 
@@ -127,10 +130,7 @@ Promise.all([...coreFixers, ...customFixers].map(async (fixer) => {
         await exec(`git checkout ${baseBranch} 2>&1`);
         // Also return any Git submodules to their original state.
         await exec(`git submodule update --force`);
-        if (!committed) {
-          // If no fixes were committed, delete the dedicated branch again.
-          await exec(`git branch -D ${fixBranch}`)
-        }
+        await exec(`git branch -D ${fixBranch} || true`)
       }
     }
   }
@@ -143,31 +143,8 @@ Promise.all([...coreFixers, ...customFixers].map(async (fixer) => {
 
 'find . -not -iwholename "*.git*" -type f -print0 | xargs -0 perl -pi -e "s/\\s+$//"'
 
-'./mach lint .'
-
-'./mach static-analysis check .'
-
-'performance-faster-string-find'
-
-'git submodule foreach git fetch && git submodule update --remote'
-
 // Tier 1
 
-'codespell -w 2>/dev/null'
-
 // Tier 2
-
-'android-cloexec-accept'
-'android-cloexec-accept4'
-'android-cloexec-creat'
-'android-cloexec-dup'
-'android-cloexec-epoll-create'
-'android-cloexec-epoll-create1'
-'android-cloexec-fopen'
-'android-cloexec-inotify-init'
-'android-cloexec-inotify-init1'
-'android-cloexec-memfd-create'
-'android-cloexec-open'
-'android-cloexec-socket'
 
 // Tier 3
